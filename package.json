@@ -1,0 +1,10 @@
+{
+  "name": "astro-intake-api",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@sendgrid/mail": "^8.1.0",
+    "openai": "^4.57.0",
+    "pdfkit": "^0.13.0"
+  }
+}
