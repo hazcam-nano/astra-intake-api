@@ -4,6 +4,28 @@ import sg from "@sendgrid/mail";
 import OpenAI from "openai";
 import crypto from "node:crypto";
 
+export default async function handler(req, res) {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS, GET");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  if (req.method === "OPTIONS") return res.status(204).end();
+
+  // ✅ Handle Shopify proxy test GET
+  if (req.method === "GET") {
+    return res.status(200).json({
+      ok: true,
+      message: "Astrology Intake API is reachable.",
+    });
+  }
+
+  // ✅ Continue with your existing POST logic
+  if (req.method !== "POST") {
+    return res.status(405).json({ ok: false, error: "Method not allowed" });
+  }
+
+}
+
 // ---- Env checks (printed to Runtime Logs, won't crash) ----
 if (!process.env.SENDGRID_API_KEY) console.warn("WARN: SENDGRID_API_KEY missing");
 if (!process.env.OPENAI_API_KEY)  console.warn("WARN: OPENAI_API_KEY missing");
