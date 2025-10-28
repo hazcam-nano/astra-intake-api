@@ -3,6 +3,46 @@ import PDFDocument from "pdfkit";
 import sg from "@sendgrid/mail";
 import OpenAI from "openai";
 
+const setCors = (req, res) => {
+  const origin = req.headers.origin || "*"; // you can hardcode your store if you prefer
+  res.setHeader("Access-Control-Allow-Origin", origin);
+  res.setHeader("Vary", "Origin"); // caches per-origin
+  // Echo what the browser asked for (or default)
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    req.headers["access-control-request-headers"] || "Content-Type"
+  );
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+};
+
+// replace your existing helpers with this unified one:
+const json = (req, res, code, obj) => {
+  setCors(req, res);
+  res.status(code);
+  res.setHeader("Content-Type", "application/json");
+  return res.end(JSON.stringify(obj));
+};
+const bad = (req, res, code, msg, extra = {}) =>
+  json(req, res, code, { ok: false, error: msg, ...extra });
+
+// inside the default export:
+export default async function handler(req, res) {
+  if (req.method === "OPTIONS") {
+    setCors(req, res);
+    return res.status(204).end(); // no body for preflight
+  }
+
+  if (req.method !== "POST") return bad(req, res, 405, "Method not allowed");
+
+  try {
+    // ... your existing code ...
+    return json(req, res, 200, { ok: true, message: "Your reading is being sent to your email." });
+  } catch (e) {
+    console.error(e);
+    return bad(req, res, 500, "Server error.");
+  }
+}
+
 if (!process.env.SENDGRID_API_KEY) console.warn("SENDGRID_API_KEY is missing");
 if (!process.env.OPENAI_API_KEY) console.warn("OPENAI_API_KEY is missing");
 if (!process.env.FROM_EMAIL) console.warn("FROM_EMAIL is missing");
