@@ -160,6 +160,7 @@ Birth details:
     }
 
     // Email (requires verified FROM_EMAIL + SENDGRID_API_KEY)
+    const brand = process.env.BRAND_NAME || "Hazcam";
     try {
       await sg.send({
         to: email,
